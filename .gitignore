@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environment
+venv/
+env/
+
+# Django secret key 
+*.env
+.env*
+*.local
+
+# SQLite database 
+db.sqlite3
+
+# Django static + media 
+staticfiles/
+static/
+media/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Compiled files
+*.egg-info/
+.eggs/
+
+# Byte-compiled
+*.pyc
