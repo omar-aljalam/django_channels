@@ -1,4 +1,5 @@
 
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -267,5 +268,23 @@
         <textarea name="text" oninput="this.style.height = ''; this.style.height = this.scrollHeight +'px'" id="the-message-to-send"></textarea>
         <button id="send-message-button">Send</button>
     </footer>
+
+    <script>
+        const url = "ws://127.0.0.1:8000/ws/";
+        const chatsocket = new WebSocket(url);
+
+        document.getElementById("send-message-button").onclick = function(){
+            const messageInput = document.getElementById("the-message-to-send");
+            const message = messageInput.value;
+            chatsocket.send(JSON.stringify({
+                "type": "chat_message",
+                "message": message
+            }));
+        }
+        chatsocket.onmessage = function(e){
+            const data = JSON.parse(e.data);
+            console.log(data);
+        }
+    </script>
 </body>
 </html>
