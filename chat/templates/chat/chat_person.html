@@ -280,7 +280,7 @@
                 "type": "chat_message",
                 "message": message
             }));
-        }
+        } 
         chatsocket.onmessage = function(e){
             const data = JSON.parse(e.data);
             console.log(data);
