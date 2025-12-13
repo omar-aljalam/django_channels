@@ -274,12 +274,27 @@
         const chatsocket = new WebSocket(url);
 
         document.getElementById("send-message-button").onclick = function(){
+            const messages_area = document.getElementById("messages-area");
             const messageInput = document.getElementById("the-message-to-send");
-            const message = messageInput.value;
+
+            let message = messageInput.value;
             chatsocket.send(JSON.stringify({
-                "type": "chat_message",
+                "type": "new_message",
                 "message": message
             }));
+
+            messages_area.insertAdjacentHTML("beforeend",`           <section class="to">
+                <div class="details">
+                    <p>2024-01-30</p>
+                    <div class="status"><div></div><div></div></div>
+                    <p>10:55:02</p>
+                </div>
+                <div class="message">
+                    <p style="overflow-wrap: anywhere;">${message}</p>
+                </div>
+            </section>`);
+            messageInput.value = "";
+
         } 
         chatsocket.onmessage = function(e){
             const data = JSON.parse(e.data);

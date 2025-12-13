@@ -8,20 +8,10 @@ class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
 
-        self.send(text_data=json.dumps({
-            "message": "WebSocket connection established.",
-            "status": "connected"
-        }))
-
-        async_to_sync(self.channel_layer.group_add)("group_chat", self.channel_name)
-
     def receive(self, text_data):
         message = json.loads(text_data).get("message", "")
         print(f"Received message: {message}")
     
     def receiver(self, text_data):
-        # text_data is the data that comes from the layer
-        print(text_data)
-
-    def disconnect(self, code):
-        print(f"WebSocket disconnected with code: {code}")
+        pass
+ 
