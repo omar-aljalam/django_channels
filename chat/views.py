@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from django.views.generic import View
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 from channels.layers import get_channel_layer
@@ -10,20 +11,25 @@ from asgiref.sync import async_to_sync
 
 class IndexView(View):
     def get(self, request):
-        data = {
-            "type": "receiver",
-            "text_data":{
-                "title": "Chat Application",
-                "header": "Welcome to the Chat App"
-                }
-            }
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)("group_chat", data)
+        if request.user.is_authenticated:
+            return redirect("home")
         return render(request, "chat/index.html")
     
 class LoginView(View):
     def get(self, request):
         return render(request, "chat/login.html")
+    
+    def post(self, request):
+        data = request.POST
+        username = data.get("username")
+        password = data.get("password")
+        user = authenticate(request=request, username=username, password=password)
+        if user is not None:
+            login(request=request, user=user)
+            return redirect("home")
+        else:
+            message = {"error": "Invalid username or password"}
+            return render(request, "chat/login.html", message)
 
 class RegisterView(View):
     def get(self, request):
@@ -59,12 +65,18 @@ class RegisterView(View):
 
 class LogoutView(View):
     def get(self, request):
-        pass
+        logout(request)
+        return redirect("main")
+
 
 class HomeView(View):
     def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect("login")
         return render(request, "chat/home.html")
 
 class ChatPersonView(View):
     def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect("login")
         return render(request, "chat/chat_person.html")
