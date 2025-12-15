@@ -234,9 +234,9 @@
         <a href="{% url "home" %}"><button>Back</button></a>
         <div>
             <img src="{% static "chat/face.png" %}">
-            <p>person's name</p>
+            <p>{{ person.first_name }} {{ person_last_name }}</p>
         </div>
-        <p class="name-of-sender">Me : the user's name</p>
+        <p class="name-of-sender">Me : {{ me.first_name }} {{ me.last_name}}</p>
     </header>
 
     <div id="reversed_div" style="display: flex;flex-direction: column-reverse;margin: 0;padding: 0;border: 0;overflow: auto;max-width: 100%;">
@@ -270,9 +270,12 @@
     </footer>
 
     <script>
-        const url = "ws://127.0.0.1:8000/ws/";
+        const person_id = "{{ person.id }}";
+        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+        const host = window.location.host;
+        const url = `${protocol}://${host}/ws/${person_id}`;
         const chatsocket = new WebSocket(url);
-
+        
         document.getElementById("send-message-button").onclick = function(){
             const messages_area = document.getElementById("messages-area");
             const messageInput = document.getElementById("the-message-to-send");

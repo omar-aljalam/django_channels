@@ -33,6 +33,8 @@ class LoginView(View):
 
 class RegisterView(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            return redirect("home")
         return render(request, "chat/register.html")
 
     def post(self, request):
@@ -73,10 +75,20 @@ class HomeView(View):
     def get(self, request):
         if not request.user.is_authenticated:
             return redirect("login")
-        return render(request, "chat/home.html")
+        user = User.objects.get(id=request.user.id)
+        users = User.objects.filter(is_superuser=False).exclude(id=request.user.id)
+        return render(request, "chat/home.html", {
+            "user": user,
+            "users": users
+        })
 
 class ChatPersonView(View):
-    def get(self, request):
+    def get(self, request, pk):
         if not request.user.is_authenticated:
             return redirect("login")
-        return render(request, "chat/chat_person.html")
+        me = User.objects.get(id=request.user.id)
+        person = User.objects.get(id=pk)
+        return render(request, "chat/chat_person.html", {
+            "me": me,
+            "person": person
+        })
