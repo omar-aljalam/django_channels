@@ -10,7 +10,7 @@ from channels.layers import get_channel_layer
 
 from asgiref.sync import async_to_sync
 
-from .models import Message
+from .models import Message, UserChannel
 
 class IndexView(View):
     def get(self, request):
@@ -92,6 +92,18 @@ class ChatPersonView(View):
         me = User.objects.get(id=request.user.id)
         person = User.objects.get(id=pk)
         messages = Message.objects.filter(Q(sender=me, receiver=person) | Q(sender=person, receiver=me)).order_by("date")
+        data = {
+                "type": "chat_message",
+                "type_of_data": "read_message"
+            }
+        channel_layer = get_channel_layer()
+        receiver_channel = UserChannel.objects.get(user=person)
+        async_to_sync(channel_layer.send)(receiver_channel.channel_name, data)
+
+        Message.objects.filter(
+                receiver=person,
+                sender=me,
+            ).update(is_read=True)
         return render(request, "chat/chat_person.html", {
             "me": me,
             "person": person,

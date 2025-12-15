@@ -247,7 +247,11 @@
             <section class="to">
                 <div class="details">
                     <p>{{ message.date }}</p>
-                    <div class="status"><div></div><div></div></div>
+                    {% if message.is_read %}
+                        <div class="status seen"><div></div><div></div></div>
+                    {% else %}
+                        <div class="status"><div></div><div></div></div>
+                    {% endif %}
                     <p>{{ message.time }}</p>
                 </div>
                 <div class="message">
@@ -303,21 +307,35 @@
             </section>`);
             messageInput.value = "";
 
-        } 
+        }
+
         chatsocket.onmessage = function(e){
             const data = JSON.parse(e.data);
-            const date = data.date.split(" ")[0];
-            const time = data.date.split(" ")[1];
-            const messages_area = document.getElementById("messages-area");
-            messages_area.insertAdjacentHTML("beforeend",`           <section class="from">
-                <div class="details">
-                    <p>${date}</p>
-                    <p>${time}</p>
-                </div>
-                <div class="message">
-                    <p style="overflow-wrap: anywhere;">${data.message}</p>
-                </div>
-            </section>`);
+            if (data.type_of_data === "new_message"){
+                const date = data.date.split(" ")[0];
+                const time = data.date.split(" ")[1];
+                const messages_area = document.getElementById("messages-area");
+                messages_area.insertAdjacentHTML("beforeend",`           <section class="from">
+                    <div class="details">
+                        <p>${date}</p>
+                        <p>${time}</p>
+                    </div>
+                    <div class="message">
+                        <p style="overflow-wrap: anywhere;">${data.message}</p>
+                    </div>
+                </section>`);
+
+                chatsocket.send(JSON.stringify({
+                    "type_of_data": "read_message"
+                }));
+            }
+
+            else if (data.type_of_data === "read_message"){
+                const my_messages = document.getElementsByClassName("status");
+                for (let i = 0; i < my_messages.length; i++){
+                    my_messages[i].classList.add("seen");
+                }
+            }
         }
     </script>
 </body>

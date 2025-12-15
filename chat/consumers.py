@@ -30,6 +30,21 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         load_data = json.loads(text_data)
+
+        if load_data.get("type_of_data") == "read_message":
+            data = {
+                "type": "chat_message",
+                "type_of_data": "read_message"
+            }
+            receiver_channel = UserChannel.objects.get(user=User.objects.get(id=self.receiver_id))
+            async_to_sync(self.channel_layer.send)(receiver_channel.channel_name, data)
+            
+            Message.objects.filter(
+                receiver=self.receiver_id,
+                sender=self.scope["user"],
+            ).update(is_read=True)
+            return
+
         message_text = load_data.get("message")
 
         if not message_text:
@@ -44,14 +59,15 @@ class ChatConsumer(WebsocketConsumer):
                 user=User.objects.get(id=self.receiver_id))
             data = {
                 "type": "chat_message",
+                "type_of_data": "new_message",
                 "sender": self.scope["user"].id,
                 "receiver": self.receiver_id,
+                "is_read": False,
                 "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "message": message_text
             }
 
-            async_to_sync(self.channel_layer.send)(
-                receiver_channel.channel_name, data)
+            async_to_sync(self.channel_layer.send)(receiver_channel.channel_name, data)
         except UserChannel.DoesNotExist:
             pass
 
