@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Message
+from .models import Message, UserChannel
 
 # Register your models here.
 class MessageAdmin(admin.ModelAdmin):
@@ -7,3 +7,4 @@ class MessageAdmin(admin.ModelAdmin):
     readonly_fields = ("sender", "receiver", "date", "message", "is_read")
 
 admin.site.register(Message, MessageAdmin)
+admin.site.register(UserChannel)

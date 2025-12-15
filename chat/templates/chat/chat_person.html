@@ -301,7 +301,18 @@
         } 
         chatsocket.onmessage = function(e){
             const data = JSON.parse(e.data);
-            console.log(data);
+            const date = data.date.split(" ")[0];
+            const time = data.date.split(" ")[1];
+            const messages_area = document.getElementById("messages-area");
+            messages_area.insertAdjacentHTML("beforeend",`           <section class="from">
+                <div class="details">
+                    <p>${date}</p>
+                    <p>${time}</p>
+                </div>
+                <div class="message">
+                    <p style="overflow-wrap: anywhere;">${data.message}</p>
+                </div>
+            </section>`);
         }
     </script>
 </body>
