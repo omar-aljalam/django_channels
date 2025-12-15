@@ -241,26 +241,31 @@
 
     <div id="reversed_div" style="display: flex;flex-direction: column-reverse;margin: 0;padding: 0;border: 0;overflow: auto;max-width: 100%;">
         <main id="messages-area">
+
+            {% for message in messages  %}
+                {% if message.sender == me %}
             <section class="to">
                 <div class="details">
-                    <p>2024-01-30</p>
+                    <p>{{ message.date }}</p>
                     <div class="status"><div></div><div></div></div>
-                    <p>10:55:02</p>
+                    <p>{{ message.time }}</p>
                 </div>
                 <div class="message">
-                    <p style="overflow-wrap: anywhere;">Message from you</p>
+                    <p style="overflow-wrap: anywhere;">{{ message.message }}</p>
                 </div>
             </section>
-
+            {% else %}
             <section class="from">
                 <div class="details">
-                    <p>2024-01-30</p>
-                    <p>10:55:02</p>
+                    <p>{{ message.date }}</p>
+                    <p>{{ message.time }}</p>
                 </div>
                 <div class="message">
-                    <p style="overflow-wrap: anywhere;">Message from the other</p>
+                    <p style="overflow-wrap: anywhere;">{{ message.message }}</p>
                 </div>
             </section>
+            {% endif %}
+            {% endfor %}
         </main>
     </div>
 

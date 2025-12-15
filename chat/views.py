@@ -4,10 +4,13 @@ from django.views.generic import View
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from channels.layers import get_channel_layer
 
 from asgiref.sync import async_to_sync
+
+from .models import Message
 
 class IndexView(View):
     def get(self, request):
@@ -88,7 +91,9 @@ class ChatPersonView(View):
             return redirect("login")
         me = User.objects.get(id=request.user.id)
         person = User.objects.get(id=pk)
+        messages = Message.objects.filter(Q(sender=me, receiver=person) | Q(sender=person, receiver=me)).order_by("date")
         return render(request, "chat/chat_person.html", {
             "me": me,
-            "person": person
+            "person": person,
+            "messages": messages
         })
